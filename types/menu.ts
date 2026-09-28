@@ -29,3 +29,8 @@ export interface StopItemPayload {
   /** ISO 8601 timestamp; null means until the end of the shift. */
   until: string | null;
 }
+
+export interface MenuFilters {
+  shop?: Shop;
+  status?: MenuItemStatus["kind"];
+}
