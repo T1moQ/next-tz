@@ -3,7 +3,9 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import type { MenuFilters } from "@/types/menu";
+import { Button } from "@/shared/ui/Button";
 import { createFiltersHref, readMenuFilters } from "../model/filters";
+import { shopLabels } from "../model/labels";
 
 export function Filters({ filters }: { filters: MenuFilters }) {
   const router = useRouter();
@@ -41,9 +43,11 @@ export function Filters({ filters }: { filters: MenuFilters }) {
             className="min-h-11 w-full rounded-lg border border-[#171512]/20 bg-white px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C6462F] sm:w-52"
           >
             <option value="">Все цеха</option>
-            <option value="kitchen">Кухня</option>
-            <option value="bar">Бар</option>
-            <option value="pastry">Кондитерская</option>
+            {Object.entries(shopLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -64,14 +68,14 @@ export function Filters({ filters }: { filters: MenuFilters }) {
           </select>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           disabled={!filters.shop && !filters.status}
           onClick={() => navigate({})}
-          className="min-h-11 rounded-lg px-3 text-sm font-medium text-[#C6462F] hover:bg-[#C6462F]/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C6462F] disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-11"
         >
           Сбросить
-        </button>
+        </Button>
       </fieldset>
       <p role="status" className="mt-2 min-h-5 text-sm text-[#171512]/60">
         {isPending ? "Обновляем фильтры…" : ""}

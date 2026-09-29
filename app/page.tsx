@@ -1,5 +1,6 @@
 import { readMenuFilters } from "@/features/stop-list/model/filters";
 import { Filters } from "@/features/stop-list/ui/Filters";
+import { StopList } from "@/features/stop-list/ui/StopList";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const filters = readMenuFilters(await searchParams);
@@ -14,6 +15,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           </p>
         </header>
         <Filters filters={filters} />
+        <StopList filters={filters} />
       </div>
     </main>
   );
