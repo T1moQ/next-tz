@@ -5,12 +5,17 @@ import type { MenuFilters } from "@/types/menu";
 import { Button } from "@/shared/ui/Button";
 import { menuItemsQueryOptions } from "../model/queries";
 import { useResumeItem } from "../model/use-resume-item";
+import { useStopListStore } from "../model/stop-list-store";
+import { usePendingMenuItems } from "../model/use-pending-menu-items";
+import { StopReasonPanel } from "./StopReasonPanel";
 import { StopListTable } from "./StopListTable";
 
 export function StopList({ filters }: { filters: MenuFilters }) {
   const menu = useQuery(menuItemsQueryOptions(filters));
   const resume = useResumeItem();
-  const pendingItemId = resume.isPending ? resume.variables.id : undefined;
+  const pendingItemIds = usePendingMenuItems();
+  const selectedItemId = useStopListStore((state) => state.selectedItemId);
+  const openPanel = useStopListStore((state) => state.openPanel);
 
   if (menu.isPending) {
     return (
@@ -39,7 +44,7 @@ export function StopList({ filters }: { filters: MenuFilters }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="menu-title" className="text-lg font-semibold">Позиции меню</h2>
         <p role="status" className="text-sm text-[#171512]/60">
-          {resume.isPending ? "Сохраняется…" : menu.isFetching ? "Обновляем меню…" : `Найдено: ${items.length}`}
+          {pendingItemIds.length > 0 ? "Сохраняется…" : menu.isFetching ? "Обновляем меню…" : `Найдено: ${items.length}`}
         </p>
       </div>
 
@@ -65,10 +70,12 @@ export function StopList({ filters }: { filters: MenuFilters }) {
       ) : (
         <StopListTable
           items={items}
-          pendingItemId={pendingItemId}
+          pendingItemIds={pendingItemIds}
+          onStop={openPanel}
           onResume={(id) => resume.mutate({ id })}
         />
       )}
+      {selectedItemId && <StopReasonPanel key={selectedItemId} itemId={selectedItemId} />}
     </section>
   );
 }

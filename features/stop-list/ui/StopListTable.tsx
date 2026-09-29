@@ -5,9 +5,9 @@ import { shopLabels, stopReasonLabels } from "../model/labels";
 
 interface StopListTableProps {
   items: MenuItem[];
-  pendingItemId?: string;
+  pendingItemIds: readonly string[];
   onResume: (id: string) => void;
-  onStop?: (id: string) => void;
+  onStop: (id: string) => void;
 }
 
 const deadlineFormatter = new Intl.DateTimeFormat("ru-RU", {
@@ -19,7 +19,7 @@ const deadlineFormatter = new Intl.DateTimeFormat("ru-RU", {
 
 export function StopListTable({
   items,
-  pendingItemId,
+  pendingItemIds,
   onResume,
   onStop,
 }: StopListTableProps) {
@@ -45,7 +45,7 @@ export function StopListTable({
         <tbody className="divide-y divide-[#171512]/[0.07]">
           {items.map((item) => {
             const stopped = item.status.kind === "stopped";
-            const saving = pendingItemId === item.id;
+            const saving = pendingItemIds.includes(item.id);
             const resumeHint = item.stock === 0
               ? "Нельзя вернуть в продажу: остаток равен нулю"
               : undefined;
@@ -93,7 +93,7 @@ export function StopListTable({
                     <div className="flex flex-col items-end gap-1">
                       <span title={resumeHint}>
                         <Button
-                          disabled={item.stock === 0 || pendingItemId !== undefined}
+                          disabled={item.stock === 0 || pendingItemIds.length > 0}
                           aria-describedby={item.stock === 0 ? `stock-hint-${item.id}` : undefined}
                           onClick={() => onResume(item.id)}
                         >
@@ -103,8 +103,8 @@ export function StopListTable({
                       {item.stock === 0 && <span id={`stock-hint-${item.id}`} className="text-xs text-[#171512]/50">Нет в наличии</span>}
                       <Button
                         variant="ghost"
-                        disabled={!onStop || pendingItemId !== undefined}
-                        onClick={() => onStop?.(item.id)}
+                        disabled={pendingItemIds.length > 0}
+                        onClick={() => onStop(item.id)}
                       >
                         Изменить стоп
                       </Button>
@@ -112,8 +112,8 @@ export function StopListTable({
                   ) : (
                     <Button
                       variant="primary"
-                      disabled={!onStop || pendingItemId !== undefined}
-                      onClick={() => onStop?.(item.id)}
+                      disabled={pendingItemIds.length > 0}
+                      onClick={() => onStop(item.id)}
                     >
                       В стоп-лист
                     </Button>
